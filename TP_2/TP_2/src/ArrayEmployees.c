@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-
+#include "Input.h"
 #include "ArrayEmployees.h"
 #define TRUE 0
 #define FALSE 1
 
 int initEmployees(Employee* list, int len){
-    setbuf(stdout,NULL);
+
     int retorno;
     retorno = -1;
 	int i;
@@ -24,82 +24,113 @@ int initEmployees(Employee* list, int len){
 	return retorno;
 }
 
+int searchFreeSpace(Employee* list, int len){
+    int retorno = -1;
+    if(list != NULL && len >= 0){
+		for (int i = 0; i < len; ++i) {
+			if(list[i].isEmpty == TRUE){
+				retorno = i;
+				break;
+			}
+		}
+    }
+    return retorno;
+}
+
+int loadEmployee(char name[],char lastName[],float* salary,int* sector){
+	int retorno = 0;
+
+	if(name != NULL && lastName != NULL && salary != NULL && sector != NULL){
+		if(ObtenerString("Ingrese el nombre del empleado",name,21,3) == -1){
+			puts ("Cancelando carga...");
+			  retorno = -1;
+			  return retorno;
+
+		}
+		else if(ObtenerString("Ingrese el apellido del empleado",lastName,21,3) == -1){
+			puts ("Cancelando carga...");
+			 retorno = -1;
+			 return retorno;
+		}
+		else if(ObtenerFlotanteMayorACero(salary,"Ingresar el salario del empleado\n",3) == -1){
+			retorno = -1;
+			return retorno;
+		}
+		else if(ObtenerEnteroMayorACero(sector,"Ingresar el sector del empleado\n",3) == -1){
+			retorno = -1;
+			return retorno;
+		}
+	}
+
+		return retorno;
+}
 int addEmployee(Employee* list, int len, int id, char name[],char lastName[],float salary,int sector)
 {
-    setbuf(stdout,NULL);
-	int retorno;
-	retorno = -1;
+	int retorno = -1;
 
-	int i;
-	for(i = 0; i < len; i++ ){
-		if(list != NULL && len >= 0 && list[i].isEmpty == TRUE)
-		{
-		    list[i].id = id;
-		    strcpy(list[i].name, name);
-		    strcpy(list[i].lastName, lastName);
-		    list[i].salary = salary;
-		    list[i].sector = sector;
-		    list[i].isEmpty= FALSE;
-		    retorno = 0;
-		    break;
+	 if(list != NULL && len >= 0 && id >= 0 && salary >= 0 && sector >=0 ){
+
+		int posicion;
+		posicion = searchFreeSpace(list,len);
+		if(posicion != -1){
+			list[posicion].id = id;
+			strcpy(list[posicion].name, name);
+			strcpy(list[posicion].lastName, lastName);
+			list[posicion].salary = salary;
+			list[posicion].sector = sector;
+			list[posicion].isEmpty= FALSE;
+			retorno = 0;
+
 		}
+	 }
 
-	}
-	return retorno;
+    return retorno;
 }
 
 int findEmployeeById(Employee* list, int len,int id){
 	int retorno = -1;
-
+	if(list != NULL && len >= 0 && id >= 0){
 		for (int i = 0; i < len; ++i) {
 
 				 if(list[i].id == id){
 
 					 retorno = i;
-
+					 break;
 				}
 		 }
-
+	}
     return retorno;
 }
 
 int modifyEmployee( Employee* list, int len, int id){
 
 	int ModificarMenu;
-    int retorno;
-     retorno = findEmployeeById(list,len,id);
+    int retorno = -1;
+    if(list != NULL && len >= 0 && id >= 0){
+		 retorno = findEmployeeById(list,len,id);
 
-	if(retorno != -1 ){
-         printf("Que quiere modificar \n 1-Nombre \n 2- Apellido \n 3- Salario \n 4- Sector");
-		 scanf ("%d",&ModificarMenu);
+		if(retorno != -1 ){
+			 ObtenerEnteroEntreRango(&ModificarMenu,"¿Que desea modificar? \n 1- Nombre \n 2- Apellido \n 3- Salario \n 4- Sector\nOpcion: ",1,4,3);
 
-		 switch (ModificarMenu) {
-			case 1:
-				printf("Ingrese el nombre nuevo");
-				fflush(stdin);
-				fgets(list[retorno].name,sizeof(list[retorno].name),stdin);
-				puts(list[retorno].name);
 
-				break;
-			case 2:
-				printf("Ingrese el Apellido nuevo");
-				fflush(stdin);
-				fgets(list[retorno].lastName,sizeof(list[retorno].lastName),stdin);
-				puts(list[retorno].lastName);
-				break;
-
-			case 3:
-				printf("Ingrese el Salario nuevo");
-				scanf("%f",&list[retorno].salary);
-				printf("el nuevo salario es %f",list[retorno].salary);
-				 break;
-			case 4:
-				printf("Ingrese el Sector nuevo");
-				scanf("%d",&list[retorno].sector);
-				printf("el nuevo sector es %d",list[retorno].sector);
-				break;
-		 }
-	}
+			 switch (ModificarMenu) {
+				case 1:
+					ObtenerString("Ingrese el Nombre nuevo",list[retorno].name,sizeof(list[retorno].name),3);
+					break;
+				case 2:
+					ObtenerString("Ingrese el Apellido nuevo",list[retorno].lastName,sizeof(list[retorno].lastName),3);
+					break;
+				case 3:
+					ObtenerFlotanteMayorACero(&list[retorno].salary, "Ingrese el Salario nuevo",3);
+					break;
+				case 4:
+					ObtenerEnteroMayorACero(&list[retorno].sector ,"Ingrese el Sector nuevo",3);
+					break;
+			 }
+		}else{
+			puts("\nNo existe ningun empleado con ese ID\n");
+		}
+    }
 	return retorno;
 }
 int removeEmployee(Employee* list, int len, int id){
@@ -176,7 +207,7 @@ int sortEmployees(Employee* list, int len, int order){
 int printEmployees(Employee* list, int len){
 	int retorno = -1;
 
-	setbuf(stdout, NULL);
+
 	if(list != NULL && len >= 0){
 			retorno = 0;
 			puts("|ID|         NOMBRE        |         APELLIDO          |     SALARIO    |    SECTOR   |");

@@ -8,7 +8,7 @@
 #include "input.h"
 #include "output.h"
 
-#define TAM 5
+#define TAM 1000
 #define TRUE 0
 #define FALSE 1
 int main(void) {
@@ -22,8 +22,8 @@ int main(void) {
 	float salario ;
 	int sector;
 	int opcion;
-	int retornoFuncion;
-
+	int posicion;
+    int flagEmpleadoCargado = 0;
 
 	Employee listaEmpleados[TAM];
 
@@ -31,80 +31,74 @@ int main(void) {
 
 	do{
 			MostrarMenu();
-			ObtenerEntero(&opcion,"Ingrese una opcion");
-
-
+			ObtenerEntero(&opcion,"\nIngrese una opcion: ",3);
 			switch(opcion){
 				case 1:
-					do{
-						retornoFuncion = ObtenerString("Ingrese el nombre del empleado","Error, cargue nuevamente",nombre,21);
-						}while(retornoFuncion == -1);
-					do{
-						retornoFuncion = ObtenerString("Ingrese el apellido del empleado","Error, cargue nuevamente",apellido,21);
-						}while(retornoFuncion == -1);
-
-					do{
-						 retornoFuncion = ObtenerFlotante(&salario,"Ingresar el salario del empleado");
-					}while(retornoFuncion == -1);
-
-
-					do{
-						 retornoFuncion = ObtenerEntero(&sector,"Ingresar el sector del empleado");
-					}while(retornoFuncion == -1);
-					idInicial++;
-					retornoFuncion = addEmployee(listaEmpleados,TAM,idInicial,nombre,apellido,salario,sector);
-					if(retornoFuncion != -1){
-						puts("El producto se cargo exitosamente\n");
-					}else{
-						idInicial--;
-						puts("El producto no pudo cargarse\n");
+					posicion = searchFreeSpace(listaEmpleados,TAM);
+					if( posicion != -1 ){
+						if (loadEmployee(nombre,apellido,&salario,&sector) == 0){
+							idInicial++;
+							if(addEmployee(listaEmpleados,TAM,idInicial,nombre,apellido,salario,sector) != -1){
+								puts("El empleado se cargo exitosamente\n");
+								flagEmpleadoCargado = 1;
+							}
+							else{
+								idInicial--;
+								puts("El empleado no pudo cargarse\n");
+							}
+						}
+					}
+					else{
+					  printf("Ya ha llegado al limite de: %d empleados.\nSi desea, puede eliminar alguno en la opcion 3\n",TAM);
 					}
 				break;
 				case 2:
-					printf("Ingrese el ID a modificar");
-				    scanf("%d",&idModificar);
+					if(flagEmpleadoCargado == 1){
+						printEmployees(listaEmpleados, TAM);
+						ObtenerEntero(&idModificar,"Ingrese el ID a modificar: ",3);
 
-					retornoFuncion = modifyEmployee(listaEmpleados, TAM,idModificar);
+						if(modifyEmployee(listaEmpleados, TAM,idModificar)!= -1){
+							puts("El empleado se modificó exitosamente\n");
+						}
 
-					if(retornoFuncion != -1){
-						puts("El producto se modificó exitosamente\n");
 					}else{
-						puts("El producto no pudo modificarse\n");
+						puts("Aun no hay ningun empleado cargado ");
 					}
+
 
 				break;
 				case 3:
-					printf("Ingrese el ID a eliminar");
-				    scanf("%d",&idEliminar);
-					retornoFuncion=	removeEmployee(listaEmpleados, TAM,idEliminar);
-
-					if(retornoFuncion!=-1)
-					{
-						printf("El producto se borro exitosamente.\n");
+					if(flagEmpleadoCargado == 1){
+						printEmployees(listaEmpleados, TAM);
+						ObtenerEntero(&idEliminar,"Ingrese el ID a eliminar: ",3);
+						if(removeEmployee(listaEmpleados, TAM,idEliminar)!=-1){
+							printf("El empleado se borro exitosamente.\n");
+						}
+						else{
+							printf("no se pudo borrar el empleado.\n");
+						}
 					}
-					else
-					{
-						printf("no se pudo borrar el producto.\n");
+					else{
+						puts("Aun no hay ningun empleado cargado ");
 					}
 
 					break;
 
 				case 4:
-
-
-
-					sortEmployees(listaEmpleados, TAM, FALSE);
-					printEmployees(listaEmpleados, TAM);
-					Salary(listaEmpleados,TAM);
-
-
+					if(flagEmpleadoCargado == 1){
+						sortEmployees(listaEmpleados, TAM, FALSE);
+						printEmployees(listaEmpleados, TAM);
+						Salary(listaEmpleados,TAM);
+					}else{
+						puts("Aun no hay ningun empleado cargado ");
+					}
 				break;
 				case 5:
 					printf("Ha salido con exito!");
 					break;
 			}
 
-		}while(idInicial < TAM && opcion != 5);
+		}while(opcion != 5);
 
 
 	return EXIT_SUCCESS;

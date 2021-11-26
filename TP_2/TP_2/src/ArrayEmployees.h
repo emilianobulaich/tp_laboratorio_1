@@ -71,9 +71,22 @@ int printEmployees(Employee* list, int length);
 
 /// \brief Calcula el total y el promedio de los salarios de los empleados y la cantidad de los mismos que superan el promedio
 /// \param lista empleados*
-/// \param tam int
+/// \param len int
 /// \return int Return (-1) si hay error [Invalid length or NULL pointer] - (0) si esta  Ok
 int Salary(Employee* list, int len);
 
+/// \brief Pide los datos del empleado al usuario.
+/// \param name[] char
+/// \param lastName[] char
+/// \param salary float*
+/// \param sector int*
+/// \return int Return (-1) si hay error [Invalid length or NULL pointer] - (0) si esta  Ok
+int loadEmployee(char name[],char lastName[],float* salary,int* sector);
+
+/// \brief Busca un espacio libre (isEmpty en TRUE).
+/// \param list Employee*
+/// \param len int
+/// \return int Return (-1) si hay error [Invalid length or NULL pointer] - (0) si esta  Ok
+int searchFreeSpace(Employee* list, int len);
 
 #endif /* ARRAYEMPLOYEES_H_ */

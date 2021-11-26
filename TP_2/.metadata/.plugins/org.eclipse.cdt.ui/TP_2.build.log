@@ -1,1 +1,6 @@
-Info: Nothing to build for TP_2
+15:02:54 **** Incremental Build of configuration Debug for project TP_2 ****
+Info: Internal Builder is used for build
+gcc -o TP_2.exe "src\\ArrayEmployees.o" "src\\Input.o" "src\\TP_2.o" "src\\output.o" 
+
+15:02:55 Build Finished. 0 errors, 0 warnings. (took 208ms)
+
